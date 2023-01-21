@@ -1,11 +1,38 @@
-import {StyleSheet, Text, View} from 'react-native';
+import { StyleSheet, Text, View } from 'react-native';
 import CustomButton from '@components/CustomButton';
-import {color, fontFamily, fontSize} from '@styles';
-import {Navigator} from '@Navigator';
+import { color, fontFamily, fontSize } from '@styles';
+import { Navigator } from '@Navigator';
+import { Navigation, NavigationComponentProps } from 'react-native-navigation';
 import React from 'react';
-import {Utils} from '@Utils';
+import { Utils } from '@Utils';
+import { ApiEndPoint } from 'services/ApiEndPoint';
+import { ApiServices } from 'services/ApiServices';
+import { screenName } from '@screenName';
 
-const PopUpCancelPlan = () => {
+export interface Props extends NavigationComponentProps {
+  propsData: any
+}
+
+const PopUpCancelPlan: React.FC<Props> = props => {
+  const { propsData } = props
+
+  const cancleCurrentPlan = async () => {
+    const json = JSON.stringify({
+      id: await Utils._getUserId()
+    });
+    const response: any = await ApiServices.post(ApiEndPoint.cancelSubscription, json);
+    if (response?.status) {
+      await Utils._setUserData(response?.data);
+      if (propsData?.isShow) {
+        Navigator.setHome()
+      }
+      Navigator.dismissOverlay()
+      Navigator.setMergeOption(props.componentId, 2);
+      Navigator.showAlert(response?.message, 'success')
+    }
+  }
+
+
   return (
     <View style={styles.container}>
       <View style={styles.centerContainer}>
@@ -19,7 +46,7 @@ const PopUpCancelPlan = () => {
           backgroundColor={color.white}
           titleColor={color.black}
           title={'Yes'}
-          onPress={() => Navigator.dismissOverlay()}
+          onPress={cancleCurrentPlan}
         />
         <CustomButton
           marginTop={Utils.calculateHeight(30)}

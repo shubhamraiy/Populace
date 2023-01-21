@@ -1,21 +1,21 @@
-import {Platform, StyleSheet, Text, View} from 'react-native';
+import { Platform, StyleSheet, Text, View } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
-import React, {useEffect, useState} from 'react';
+import React, { useEffect, useState } from 'react';
 import MySafeArea from '@components/MySafeArea';
-import {NavigationComponentProps} from 'react-native-navigation';
-import {color, fontFamily, fontSize} from '@styles';
-import {Utils} from '@Utils';
+import { NavigationComponentProps } from 'react-native-navigation';
+import { color, fontFamily, fontSize } from '@styles';
+import { Utils } from '@Utils';
 import CustomButton from '@components/CustomButton';
 import MyTextInput from '@components/MyTextInput';
 import TermsCondition from '@components/TermsCondition';
-import {Navigator} from '@Navigator';
-import {screenName} from '@screenName';
-import {ApiServices} from '../services/ApiServices';
-import {ApiEndPoint} from '../services/ApiEndPoint';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
+import { Navigator } from '@Navigator';
+import { screenName } from '@screenName';
+import { ApiServices } from '../services/ApiServices';
+import { ApiEndPoint } from '../services/ApiEndPoint';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import appleAuth from '@invertase/react-native-apple-authentication';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps { }
 
 const SignIn: React.FC<Props> = props => {
   const [email, setEmail] = useState('');
@@ -28,6 +28,7 @@ const SignIn: React.FC<Props> = props => {
       webClientId:
         '906490794599-pmjoevuqtuidpqlmgb6874mc0466p098.apps.googleusercontent.com',
       offlineAccess: true,
+      iosClientId: '906490794599-fqhvr8uoc9lobcs04huqpbt0hehmc2n1.apps.googleusercontent.com'
     });
   }, []);
 
@@ -65,7 +66,7 @@ const SignIn: React.FC<Props> = props => {
       if (result?.data?.isSubscribe) {
         Navigator.setHome();
       } else {
-        Navigator.setRoot(screenName.Subscription,{isShow: true});
+        Navigator.setRoot(screenName.Subscription, { isShow: true });
       }
     } else if (result.status && result?.data?.isRegistered === false) {
       Navigator.setPush(props.componentId, screenName.Register, {
@@ -85,7 +86,7 @@ const SignIn: React.FC<Props> = props => {
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
     });
 
-    console.log(appleAuthRequestResponse);
+    // console.log(appleAuthRequestResponse);
     // get current authentication state for user
     // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
     const credentialState = await appleAuth.getCredentialStateForUser(
@@ -95,7 +96,7 @@ const SignIn: React.FC<Props> = props => {
     // use credentialState response to ensure the user is authenticated
     if (credentialState === appleAuth.State.AUTHORIZED) {
       // user is authenticated
-      console.log('credentialState:', credentialState);
+      // console.log('credentialState:', credentialState);
       _socialLogin(
         appleAuthRequestResponse?.email ?? '',
         appleAuthRequestResponse?.user,
@@ -118,9 +119,9 @@ const SignIn: React.FC<Props> = props => {
         false,
         result?.user?.name,
       );
-      console.log(result);
+      // console.log(result);
     } catch (error: any) {
-      console.log(error);
+      // console.log(error);
     }
   };
 
@@ -137,7 +138,7 @@ const SignIn: React.FC<Props> = props => {
         if (result?.data?.isSubscribe) {
           Navigator.setHome();
         } else {
-          Navigator.setRoot(screenName.Subscription, {isShow: true});
+          Navigator.setRoot(screenName.Subscription, { isShow: true });
         }
       }
     }
@@ -168,7 +169,7 @@ const SignIn: React.FC<Props> = props => {
             value={isSelected}
             onValueChange={setSelection}
             style={styles.checkbox}
-            tintColors={{true: color.pictonBlue, false: color.pictonBlue}}
+            tintColors={{ true: color.pictonBlue, false: color.pictonBlue }}
           />
           <Text style={styles.tvLabel}>Remember Me</Text>
           <Text
@@ -192,7 +193,7 @@ const SignIn: React.FC<Props> = props => {
           onPress={() =>
             Navigator.setPush(props.componentId, screenName.Register)
           }
-          style={{color: color.pictonBlue}}>
+          style={{ color: color.pictonBlue }}>
           Click here
         </Text>
       </Text>

@@ -1,21 +1,42 @@
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
-import {NavigationComponentProps} from 'react-native-navigation';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Navigation, NavigationComponentProps } from 'react-native-navigation';
 import MySafeArea from '@components/MySafeArea';
-import {color, fontFamily, fontSize} from '@styles';
-import {Utils} from '@Utils';
+import { color, fontFamily, fontSize } from '@styles';
+import { Utils } from '@Utils';
 import MyTextInput from '@components/MyTextInput';
 import CustomButton from '@components/CustomButton';
-import {Navigator} from '@Navigator';
-import {screenName} from '@screenName';
+import { Navigator } from '@Navigator';
+import { screenName } from '@screenName';
+import { ApiServices } from 'services/ApiServices';
+import { ApiEndPoint } from 'services/ApiEndPoint';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps { }
 
 const EditProfile: React.FC<Props> = props => {
+  const [user, setUser] = useState({});
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = Navigation.events().registerComponentListener(
+      {
+        componentDidAppear: async () => {
+          Utils._getUserData().then(user => {
+            setUser(user)
+            setFirstName(user?.firstname)
+            setLastName(user?.lastname)
+            setEmail(user?.email)
+            setPhone(user?.phone)
+          })
+        }
+      },
+      props.componentId,
+    );
+    return () => unsubscribe.remove();
+  }, []);
 
 
   const isValidate = () => {
@@ -42,9 +63,30 @@ const EditProfile: React.FC<Props> = props => {
     }
   };
 
-  const onSubmit = () => {
+  const onSubmit = async (firstName: string, lastName: string, email: string, phone: string) => {
     if (isValidate()) {
-      Navigator.setPop(props.componentId);
+      const raw = JSON.stringify({
+        id: await Utils._getUserId(),
+        firstName: firstName,
+        lastName: lastName,
+        email: email,
+        phone: phone,
+      });
+      const result: any = await ApiServices.post(ApiEndPoint.updateProfile, raw);
+
+      if (result.status) {
+        let userData: any = { ...user };
+        if (Object.keys(result.data).length > 0) {
+          userData.firstname = result?.data?.firstname;
+          userData.lastname = result?.data?.lastname;
+          userData.email = result?.data?.email;
+          userData.phone = result?.data?.phone;
+          await Utils._setUserData(userData);
+          Navigator.setPop(props.componentId);
+        } else {
+          Navigator.setRoot(screenName.Verification, { isEmailChanged: true });
+        }
+      }
     }
   };
 
@@ -91,7 +133,7 @@ const EditProfile: React.FC<Props> = props => {
         <CustomButton
           title={'Submit'}
           marginTop={Utils.calculateHeight(60)}
-          onPress={() => onSubmit()}
+          onPress={() => onSubmit(firstName, lastName, email, phone)}
         />
       </View>
     </MySafeArea>
@@ -108,7 +150,7 @@ const styles = StyleSheet.create({
   },
 
   tvProfile: {
-    marginTop:30,
+    marginTop: 30,
     color: color.white,
     fontSize: fontSize.size_18,
     fontFamily: fontFamily.SemiBold,

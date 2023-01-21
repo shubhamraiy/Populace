@@ -35,7 +35,7 @@ const ViewPickNumber: React.FC<Props> = props => {
       id: await Utils._getUserId()
     }))
     if (response?.status) {
-      console.log("dddd", response?.data?.autoSpecificPickNumbers);
+      // console.log("dddd", response?.data?.autoSpecificPickNumbers);
       setResult(response?.data?.autoSpecificPickNumbers)
     } else {
       setResult([])
@@ -148,7 +148,7 @@ const ViewPickNumber: React.FC<Props> = props => {
           isSubmit: true
         })}
       />
-      {console.log("result?.length", result?.length)}
+      {/* {console.log("result?.length", result?.length)} */}
       {result?.length > 0 && _renderRoundBtn(true, result[0]?.number, result[0]?._id)}
       {result?.length > 1 && _renderRoundBtn(false, result[1]?.number, result[1]?._id)}
       {result?.length > 2 && _renderRoundBtn(false, result[2]?.number, result[2]?._id)}

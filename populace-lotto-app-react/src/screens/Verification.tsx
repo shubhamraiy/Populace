@@ -1,16 +1,23 @@
-import {ImageBackground, StyleSheet, Text, View} from 'react-native';
+import { ImageBackground, StyleSheet, Text, View } from 'react-native';
 import React from 'react';
-import {NavigationComponentProps} from 'react-native-navigation';
+import { NavigationComponentProps } from 'react-native-navigation';
 import MySafeArea from '@components/MySafeArea';
-import {Utils} from '@Utils';
+import { Utils } from '@Utils';
 import CustomButton from '@components/CustomButton';
-import {color, fontSize, fontFamily} from '@styles';
-import {Navigator} from '@Navigator';
-import {screenName} from '@screenName';
+import { color, fontSize, fontFamily } from '@styles';
+import { Navigator } from '@Navigator';
+import { screenName } from '@screenName';
+import { ApiServices } from 'services/ApiServices';
+import { ApiEndPoint } from 'services/ApiEndPoint';
+import { MyAsyncStorage } from '@MyAsyncStorage';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps {
+  propsData: any;
+}
 
 const Verification: React.FC<Props> = props => {
+  const { propsData } = props;
+
   return (
     <MySafeArea componentId={props.componentId} isBottomBgShow>
       <View style={styles.container}>
@@ -18,10 +25,14 @@ const Verification: React.FC<Props> = props => {
           style={styles.imgContainer}
           resizeMode="stretch"
           source={require('@images/register_bg_popup.png')}>
-          <Text style={styles.tvRegister}>Register</Text>
+          <Text style={styles.tvRegister}>
+            {propsData?.isEmailChanged ? "Email Verification" : "Register"}
+          </Text>
           <Text style={styles.tvTitle}>
-            A verification email has been sent to your email address. Please
-            verify your account in order to complete the registration process.
+            {propsData?.isEmailChanged ?
+              "Email verification reset link sent to your email address" :
+              "A verification email has been sent to your email address. Please verify your account in order to complete the registration process."
+            }
           </Text>
 
           <CustomButton
@@ -29,11 +40,23 @@ const Verification: React.FC<Props> = props => {
             titleColor={color.egyptianBlue}
             title={'OK'}
             onPress={async () => {
-              if (await Utils.isSubscribe()) {
-                Navigator.setHome();
+              if (propsData?.isEmailChanged) {
+                Navigator.showAlert('Changing email address, need to login again.')
+                const result: any = await ApiServices.post(
+                  ApiEndPoint.playerLogout,
+                  JSON.stringify({ email: await Utils.getEmail() }),
+                );
+                if (result?.status) {
+                  await MyAsyncStorage.logOut();
+                }
               } else {
-                Navigator.setRoot(screenName.Subscription, {isShow: true});
+                if (await Utils.isSubscribe()) {
+                  Navigator.setHome();
+                } else {
+                  Navigator.setRoot(screenName.Subscription, { isShow: true });
+                }
               }
+
             }}
           />
         </ImageBackground>

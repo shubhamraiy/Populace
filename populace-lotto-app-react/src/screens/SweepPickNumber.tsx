@@ -11,42 +11,85 @@ import { screenName } from '@screenName';
 import { ApiServices } from '../services/ApiServices';
 import { ApiEndPoint } from '../services/ApiEndPoint';
 
-export interface Props extends NavigationComponentProps { }
+export interface Props extends NavigationComponentProps {
+  propsData: any;
+}
 
 const SweepPickNumber: React.FC<Props> = props => {
+  const { propsData } = props;
   const [result, setResult] = useState<any>();
   const [numberOne, setNumberOne] = useState([]);
   const [numberTwo, setNumberTwo] = useState([]);
   const [numberThree, setNumberThree] = useState([]);
   const [currentUser, setCurrentUser] = useState<any>()
+  const [hour, setHour] = useState<any>()
+  const [minute, setMinute] = useState<any>()
+  const [second, setSecond] = useState<any>()
 
   useEffect(() => {
-    const unsubscribe = Navigation.events().registerComponentListener(
-      {
-        componentDidAppear: () => {
-          Utils._getUserData().then(user => {
-            setCurrentUser(user)
-          })
-          getDrawDetails();
-        }
-      },
-      props.componentId,
-    );
-    return () => unsubscribe.remove();
+    // const unsubscribe = Navigation.events().registerComponentListener(
+    //   {
+    //     componentDidAppear: () => {
+    // Utils._getUserData().then(user => {
+    //   setCurrentUser(user)
+    // })
+    // getDrawDetails();
+    //     }
+    //   },
+    //   props.componentId,
+    // );
+    // return () => unsubscribe.remove();
+    setCurrentUser(propsData?.currentUser)
+    setResult(propsData?.result);
+    setNumberOne(propsData?.numberOne);
+    setNumberTwo(propsData?.numberTwo);
+    setNumberThree(propsData?.numberThree);
   }, []);
 
+  // const getDrawDetails = async () => {
+  //   const json = JSON.stringify({ id: await Utils._getUserId() });
+  //   const response: any = await ApiServices.post(ApiEndPoint.drawDetails, json);
 
-  const getDrawDetails = async () => {
-    const json = JSON.stringify({ id: await Utils._getUserId() });
-    const response: any = await ApiServices.post(ApiEndPoint.drawDetails, json);
+  //   if (response?.status) {
+  //     setResult(response?.data);
+  //     setNumberOne(response?.data?.numberSelectedByUser[0]?.numbers1);
+  //     setNumberTwo(response?.data?.numberSelectedByUser[1]?.numbers2);
+  //     setNumberThree(response?.data?.numberSelectedByUser[2]?.numbers3);
+  //   }
+  // };
 
-    if (response?.status) {
-      setResult(response?.data);
-      setNumberOne(response?.data?.numberSelectedByUser[0]?.numbers1);
-      setNumberTwo(response?.data?.numberSelectedByUser[1]?.numbers2);
-      setNumberThree(response?.data?.numberSelectedByUser[2]?.numbers3);
+  console.log(propsData);
+
+  useEffect(() => {
+    countDown();
+  }, [second]);
+
+  const countDown = () => {
+    var countDownDate = new Date(propsData?.result?.timerDate).getTime();
+    // var countDownDate = new Date("2023-01-21T15:30:00.000Z").getTime();
+    var checknow = new Date().getTime();
+    if (countDownDate > checknow) {
+      var x = setInterval(function () {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        setHour(hours)
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        setMinute(minutes)
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        setSecond(seconds)
+        if (distance < 0) {
+          clearInterval(x);
+        }
+      }, 1000);
+    } else {
+      setHour('00')
+      setMinute('00')
+      setSecond('00')
     }
-  };
+  }
+
 
   const _renderNumbers = (list: any, type: number) => {
     return (
@@ -101,7 +144,8 @@ const SweepPickNumber: React.FC<Props> = props => {
           styles.tvDrewCut
         }>{`Draw cut -off time : ${result?.cutOffTime}`}</Text>
       <Text style={styles.tvRemaining}>Remaining Time</Text>
-      <Text style={styles.tvTime}>30h : 20m : 22s</Text>
+      {/* <Text style={styles.tvTime}>30h : 20m : 22s</Text> */}
+      <Text style={styles.tvTime}>{hour}h : {minute}m : {second}s</Text>
 
       {currentUser?.subscription?.tier >= 'tier1' && _renderNumbers(numberOne, 1)}
       {currentUser?.subscription?.tier >= 'tier2' && _renderNumbers(numberTwo, 2)}

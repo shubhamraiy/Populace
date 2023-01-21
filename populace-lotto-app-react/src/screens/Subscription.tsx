@@ -107,7 +107,7 @@ const Subscription: React.FC<Props> = props => {
 
   useEffect(() => {
     Utils._getUserData().then(user => {
-      console.log("UserData:", user);
+      // console.log("UserData:", user);
       // console.log(Object.keys(user.subscription).length);
 
       setCurrentPlan(user);
@@ -140,6 +140,8 @@ const Subscription: React.FC<Props> = props => {
         plan: saveItems.plan,
         amount: saveItems.amountInr,
       });
+      console.log(json);
+
       const response: any = await ApiServices.post(
         type === 0 ? ApiEndPoint.subscriptionPost : type === 1 ? ApiEndPoint.downgradeSubscription : ApiEndPoint.upgradeSubscription, json,);
 
@@ -218,7 +220,7 @@ const Subscription: React.FC<Props> = props => {
             title={'Upgrade'}
             width={'47%'}
             onPress={() => {
-              console.log('Upgrade', currentPlan?.subscription?.tier > selectedTier);
+              // console.log('Upgrade', currentPlan?.subscription?.tier > selectedTier);
 
               if (currentPlan?.subscription?.tier > selectedTier) {
                 Navigator.showAlert('Selected plan downgraded');
@@ -237,7 +239,7 @@ const Subscription: React.FC<Props> = props => {
             width={'47%'}
             backgroundColor={color.denim}
             onPress={() => {
-              console.log('Downgrade', selectedTier);
+              // console.log('Downgrade', selectedTier);
               if (currentPlan?.subscription?.tier < selectedTier) {
                 Navigator.showAlert('Selected plan upgradeable');
               } else if (currentPlan?.subscription?.tier < selectedTier) {

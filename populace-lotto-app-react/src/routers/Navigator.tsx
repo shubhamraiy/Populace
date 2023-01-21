@@ -1,18 +1,27 @@
-import {Navigation} from 'react-native-navigation';
-import {registerScreens, screenName} from '@screenName';
-import {color} from '@styles';
-import {LogBox} from 'react-native';
-import {OptionsModalPresentationStyle} from 'react-native-navigation/lib/src/interfaces/Options';
-import {Utils} from '@Utils';
+import { Navigation } from 'react-native-navigation';
+import { registerScreens, screenName } from '@screenName';
+import { color } from '@styles';
+import { LogBox } from 'react-native';
+import { OptionsModalPresentationStyle } from 'react-native-navigation/lib/src/interfaces/Options';
+import { Utils } from '@Utils';
 
 registerScreens();
 
+// const bottomTabEventListener = Navigation.events().registerBottomTabSelectedListener(({ selectedTab, unselectedTab }) => {
+//   Navigation.popToRoot(screenName.Subscription)
+//   Navigation.popToRoot(screenName.HowItWork)
+//   Navigation.popToRoot(screenName.Home)
+//   Navigation.popToRoot(screenName.MyAccount)
+//   Navigation.popToRoot(screenName.Profile)
+// })
+
+
 export const Navigator = {
+
   setSplash(screenName: any) {
     LogBox.ignoreAllLogs();
     LogBox.ignoreLogs(['flexWrap:']);
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
-
     Navigation.events().registerAppLaunchedListener(async () => {
       this.setDefault();
       this.setRoot(screenName);
@@ -144,7 +153,7 @@ export const Navigator = {
               component: {
                 id: screenName,
                 name: screenName,
-                passProps: {propsData},
+                passProps: { propsData },
               },
             },
           ],
@@ -158,7 +167,7 @@ export const Navigator = {
       component: {
         name: screenName,
         id: screenName,
-        passProps: {propsData},
+        passProps: { propsData },
       },
     });
   },
@@ -224,7 +233,7 @@ export const Navigator = {
           {
             component: {
               name: screenName,
-              passProps: {propsData},
+              passProps: { propsData },
               options: {
                 overlay: {
                   interceptTouchOutside: true, // this make touch events pass through the invisible parts of the overlay
@@ -266,7 +275,7 @@ export const Navigator = {
       component: {
         name: name,
         id: name,
-        passProps: {propsData},
+        passProps: { propsData },
         options: {
           overlay: {
             interceptTouchOutside: false,
@@ -320,6 +329,7 @@ export const Navigator = {
       });
   },
 
+
   setDefault() {
     Navigation.setDefaultOptions({
       topBar: {
@@ -339,13 +349,13 @@ export const Navigator = {
       bottomTabs: {
         backgroundColor: color.celticBlue,
         titleDisplayMode: 'alwaysShow',
-        // currentTabIndex: 2,
+        currentTabId: screenName.Home
       },
       statusBar: {
         // backgroundColor: color.black,
         // style: 'light',
       },
-      layout: {orientation: ['portrait']},
+      layout: { orientation: ['portrait'] },
     });
   },
 };

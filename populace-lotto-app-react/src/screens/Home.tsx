@@ -1,15 +1,52 @@
-import {ImageBackground, Pressable, StyleSheet, Text, View} from 'react-native';
-import React from 'react';
-import {NavigationComponentProps} from 'react-native-navigation';
+import { ImageBackground, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Navigation, NavigationComponentProps } from 'react-native-navigation';
 import MySafeArea from '@components/MySafeArea';
-import {Utils} from '@Utils';
-import {fontSize, fontFamily, color, fontWeight} from '@styles';
-import {screenName} from '@screenName';
-import {Navigator} from '@Navigator';
+import { Utils } from '@Utils';
+import { fontSize, fontFamily, color, fontWeight } from '@styles';
+import { screenName } from '@screenName';
+import { Navigator } from '@Navigator';
+import { ApiServices } from 'services/ApiServices';
+import { ApiEndPoint } from 'services/ApiEndPoint';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps { }
 
 const Home: React.FC<Props> = props => {
+  const [status, setStatus] = useState(false);
+  const [result, setResult] = useState<any>();
+  const [numberOne, setNumberOne] = useState([]);
+  const [numberTwo, setNumberTwo] = useState([]);
+  const [numberThree, setNumberThree] = useState([]);
+  const [currentUser, setCurrentUser] = useState<any>()
+
+  useEffect(() => {
+    const unsubscribe = Navigation.events().registerComponentListener(
+      {
+        componentDidAppear: () => {
+          Utils._getUserData().then(user => {
+            setCurrentUser(user)
+          })
+          getDrawDetails();
+        }
+      },
+      props.componentId,
+    );
+    return () => unsubscribe.remove();
+  }, []);
+
+
+  const getDrawDetails = async () => {
+    const json = JSON.stringify({ id: await Utils._getUserId() });
+    const response: any = await ApiServices.post(ApiEndPoint.drawDetails, json);
+    setStatus(response?.status)
+    if (response?.status) {
+      setResult(response?.data);
+      setNumberOne(response?.data?.numberSelectedByUser[0]?.numbers1);
+      setNumberTwo(response?.data?.numberSelectedByUser[1]?.numbers2);
+      setNumberThree(response?.data?.numberSelectedByUser[2]?.numbers3);
+    }
+  };
+
   const _renderBgBtn = (
     title: string,
     marginTop: any,
@@ -23,12 +60,23 @@ const Home: React.FC<Props> = props => {
             type === 1
               ? screenName.SweepPickNumber
               : type === 2
-              ? screenName.SweepPickNumber
-              : type === 3
-              ? screenName.FinancialServices
-              : screenName.InsuranceServices;
+                ? screenName.SweepPickNumber
+                : type === 3
+                  ? screenName.FinancialServices
+                  : screenName.InsuranceServices;
 
-          Navigator.setPush(props.componentId, name);
+          if ((type === 1 || type === 2) && status) {
+            Navigator.setPush(props.componentId, name, {
+              result: result,
+              currentUser: currentUser,
+              numberOne: numberOne,
+              numberTwo: numberTwo,
+              numberThree: numberThree
+            });
+          } else if (type === 3 || type === 4) {
+            Navigator.setPush(props.componentId, name)
+          }
+
         }}>
         <ImageBackground
           resizeMode="stretch"
@@ -60,7 +108,7 @@ const Home: React.FC<Props> = props => {
       )}
 
       <Text style={styles.tvSweepstakes}>{'Sweepstakes \nDrawing'}</Text>
-      <Text style={styles.tvDate}>4/10/2022</Text>
+      <Text style={styles.tvDate}>{result?.scheduledDate}</Text>
       <Text style={styles.tvMillion}>$5 Million</Text>
       {_renderBgBtn(
         'Play Now',

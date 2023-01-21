@@ -16,7 +16,7 @@ export const Utils = {
 
   isUrlValid(url: any) {
     let reg = Utils.exp_pattern_url;
-    console.log('Url validation', reg.test(url));
+    // console.log('Url validation', reg.test(url));
 
     return reg.test(url);
   },
@@ -65,19 +65,17 @@ export const Utils = {
   },
   async isSubscribe() {
     const user = await MyAsyncStorage.getData(keyName.userData);
-    console.log("isSubscribe",user?.isSubscribe);
+    // console.log("isSubscribe",user?.isSubscribe);
     return user?.isSubscribe;
   },
   async _getToken() {
     const user = await MyAsyncStorage.getData(keyName.userData);
-    console.log('userToken', user?.token);
-
+    // console.log('userToken', user?.token);
     return user?.token;
   },
   async getEmail() {
     const user = await MyAsyncStorage.getData(keyName.userData);
-    console.log('userToken', user?.email);
-
+    // console.log('userToken', user?.email);
     return user?.email;
   },
 
@@ -131,7 +129,7 @@ export const Utils = {
   // }
   isNumeric(value: string) {
     // return validate(value.isNumeric) ? true : false
-    console.log(!value.match(/^[^0-9]+$/));
+    // console.log(!value.match(/^[^0-9]+$/));
 
     return !value.match(/^[^0-9]+$/);
   },
@@ -141,7 +139,7 @@ export const Utils = {
   },
 
   isDigit(value: any) {
-    console.log(/^[0-9]+$/.test(value));
+    // console.log(/^[0-9]+$/.test(value));
     return !!/^[0-9]+$/.test(value);
   },
 

@@ -1,15 +1,15 @@
-import React, {useState} from 'react';
-import {NavigationComponentProps} from 'react-native-navigation';
+import React, { useState } from 'react';
+import { NavigationComponentProps } from 'react-native-navigation';
 import MySafeArea from '@components/MySafeArea';
-import {FlatList, StyleSheet, Switch, Text, View} from 'react-native';
-import {color, fontFamily, fontSize} from '@styles';
-import {Utils} from '@Utils';
-import {Navigator} from '@Navigator';
-import {screenName} from '@screenName';
-import {ApiServices} from '../services/ApiServices';
-import {ApiEndPoint} from '../services/ApiEndPoint';
+import { FlatList, StyleSheet, Switch, Text, View } from 'react-native';
+import { color, fontFamily, fontSize } from '@styles';
+import { Utils } from '@Utils';
+import { Navigator } from '@Navigator';
+import { screenName } from '@screenName';
+import { ApiServices } from '../services/ApiServices';
+import { ApiEndPoint } from '../services/ApiEndPoint';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps { }
 
 const ModePickingNumber: React.FC<Props> = props => {
   const [data, setData] = useState([
@@ -67,8 +67,15 @@ const ModePickingNumber: React.FC<Props> = props => {
           autoSpecificPick: v,
         }),
       );
+      console.log(response);
+
       if (response?.status) {
         Navigator.showAlert(response.message, 'success');
+        if (response?.data?.autoSpecificPick && response?.data?.specificNumberList === null) {
+          Navigator.setPush(props.componentId, screenName.SweepTableNumber, {
+            isSubmit: true
+          })
+        }
       }
     }
   };
@@ -95,7 +102,7 @@ const ModePickingNumber: React.FC<Props> = props => {
         </View>
 
         <Switch
-          trackColor={{false: '#B8B8B8', true: color.sapphireBlue}}
+          trackColor={{ false: '#B8B8B8', true: color.sapphireBlue }}
           thumbColor={item.isEnabled ? color.white : color.white}
           ios_backgroundColor={'#B8B8B8'}
           onValueChange={async v => {
@@ -119,9 +126,9 @@ const ModePickingNumber: React.FC<Props> = props => {
       <Text style={styles.tvModeTitle}>Mode Of Picking Numbers</Text>
 
       <FlatList
-        style={{marginTop: Utils.calculateHeight(50)}}
+        style={{ marginTop: Utils.calculateHeight(50) }}
         data={data}
-        renderItem={({item, index}) => _renderSwitch(item, index)}
+        renderItem={({ item, index }) => _renderSwitch(item, index)}
       />
     </MySafeArea>
   );

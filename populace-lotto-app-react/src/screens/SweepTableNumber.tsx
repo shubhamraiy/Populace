@@ -23,7 +23,7 @@ const SweepTableNumber: React.FC<Props> = props => {
   );
 
   useEffect(() => {
-    console.log(propsData);
+    // console.log(propsData);
 
     let arrMain: any = [];
     let arrMega: any = [];

@@ -4,6 +4,7 @@ export const ApiEndPoint = {
   playerLogin: 'playerLogin',
   playerLogout: 'playerLogout',
   forgetPassword: 'forgetPassword',
+  changePassword: "changePassword",
   termsCondition: 'termsCondition',
   privacyPolicy: 'privacyPolicy',
   drawDetails: 'drawDetails',
@@ -19,4 +20,7 @@ export const ApiEndPoint = {
   accountDetails: 'accountDetails',
   upgradeSubscription: 'upgradeSubscription',
   downgradeSubscription: 'downgradeSubscription',
+  cancelSubscription: 'cancelSubscription',
+  updateProfile: 'updateProfile',
+  updateAddress: 'updateAddress',
 };

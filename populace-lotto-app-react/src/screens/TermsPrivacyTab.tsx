@@ -23,14 +23,14 @@ const TermsPrivacyTab: React.FC<Props> = props => {
 
   const getPrivacyTerms = async () => {
     const ttttt: any = await ApiServices.get(ApiEndPoint.termsCondition);
-    console.log('TTTTT:', ttttt);
+    // console.log('TTTTT:', ttttt);
     if (ttttt.status) {
       setTerms(ttttt?.data);
     }
   };
   const getPrivacyPolicy = async () => {
     const ppppp: any = await ApiServices.get(ApiEndPoint.privacyPolicy);
-    console.log('PPPPP:', ppppp);
+    // console.log('PPPPP:', ppppp);
 
     if (ppppp.status) {
       setPrivacy(ppppp?.data);

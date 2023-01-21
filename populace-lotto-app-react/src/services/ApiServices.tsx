@@ -12,7 +12,7 @@ export const ApiServices = {
         .then(async (response: any) => {
           Navigator.showLoader(false);
           const result = await response.json();
-          console.log("Response:",result);
+          // console.log("Response:",result);
           if (response.status === 500) {
             Navigator.showAlert('Something went wrong..');
           } else if (result.status === false) {
@@ -34,7 +34,7 @@ export const ApiServices = {
   },
 
   async post(endPoint: string, json: any) {
-    console.log('formData:', json);
+    // console.log('formData:', json);
     Navigator.showLoader(true);
 
     const requestOptions = {
@@ -49,7 +49,7 @@ export const ApiServices = {
         .then(async (response: any) => {
           Navigator.showLoader(false);
           const result = await response.json();
-          console.log('Response:', result);
+          // console.log('Response:', result);
           if (response?.status === 500) {
             Navigator.showAlert('Something went wrong..');
           } else if (result?.status === false) {

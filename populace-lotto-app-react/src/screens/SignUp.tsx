@@ -1,19 +1,19 @@
-import {Platform, StyleSheet, View} from 'react-native';
-import React, {useEffect} from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
+import React, { useEffect } from 'react';
 import MySafeArea from '@components/MySafeArea';
-import {NavigationComponentProps} from 'react-native-navigation';
+import { NavigationComponentProps } from 'react-native-navigation';
 import CustomButton from '@components/CustomButton';
-import {Utils} from '@Utils';
-import {color} from '@styles';
-import {Navigator} from '@Navigator';
-import {screenName} from '@screenName';
+import { Utils } from '@Utils';
+import { color } from '@styles';
+import { Navigator } from '@Navigator';
+import { screenName } from '@screenName';
 import TermsCondition from '@components/TermsCondition';
-import {GoogleSignin} from '@react-native-google-signin/google-signin';
-import {ApiServices} from '../services/ApiServices';
-import {ApiEndPoint} from '../services/ApiEndPoint';
+import { GoogleSignin } from '@react-native-google-signin/google-signin';
+import { ApiServices } from '../services/ApiServices';
+import { ApiEndPoint } from '../services/ApiEndPoint';
 import appleAuth from '@invertase/react-native-apple-authentication';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps { }
 
 const SignUp: React.FC<Props> = props => {
   useEffect(() => {
@@ -22,6 +22,7 @@ const SignUp: React.FC<Props> = props => {
       webClientId:
         '906490794599-pmjoevuqtuidpqlmgb6874mc0466p098.apps.googleusercontent.com',
       offlineAccess: true,
+      iosClientId: '906490794599-fqhvr8uoc9lobcs04huqpbt0hehmc2n1.apps.googleusercontent.com'
     });
   }, []);
 
@@ -44,7 +45,7 @@ const SignUp: React.FC<Props> = props => {
       if (result?.data?.isSubscribe) {
         Navigator.setHome();
       } else {
-        Navigator.setRoot(screenName.Subscription, {isShow: true});
+        Navigator.setRoot(screenName.Subscription, { isShow: true });
       }
     } else if (result.status && result?.data?.isRegistered === false) {
       Navigator.setPush(props.componentId, screenName.Register, {
@@ -63,7 +64,7 @@ const SignUp: React.FC<Props> = props => {
       requestedScopes: [appleAuth.Scope.EMAIL, appleAuth.Scope.FULL_NAME],
     });
 
-    console.log(appleAuthRequestResponse);
+    // console.log(appleAuthRequestResponse);
     // get current authentication state for user
     // /!\ This method must be tested on a real device. On the iOS simulator it always throws an error.
     const credentialState = await appleAuth.getCredentialStateForUser(
@@ -95,9 +96,9 @@ const SignUp: React.FC<Props> = props => {
         false,
         result?.user?.name,
       );
-      console.log(result);
+      // console.log(result);
     } catch (error: any) {
-      console.log(error);
+      // console.log(error);
     }
   };
 

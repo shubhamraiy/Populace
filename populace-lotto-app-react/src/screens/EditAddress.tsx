@@ -1,22 +1,44 @@
-import {Image, Pressable, StyleSheet, Text, View} from 'react-native';
-import React, {useState} from 'react';
-import {NavigationComponentProps} from 'react-native-navigation';
+import { Image, Pressable, StyleSheet, Text, View } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { Navigation, NavigationComponentProps } from 'react-native-navigation';
 import MySafeArea from '@components/MySafeArea';
-import {color, fontFamily, fontSize} from '@styles';
-import {Utils} from '@Utils';
+import { color, fontFamily, fontSize } from '@styles';
+import { Utils } from '@Utils';
 import MyTextInput from '@components/MyTextInput';
 import CustomButton from '@components/CustomButton';
-import {Navigator} from '@Navigator';
-import {screenName} from '@screenName';
+import { Navigator } from '@Navigator';
+import { screenName } from '@screenName';
+import { ApiServices } from 'services/ApiServices';
+import { ApiEndPoint } from 'services/ApiEndPoint';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps { }
 
 const EditAddress: React.FC<Props> = props => {
+  const [user, setUser] = useState({});
   const [street, setStreet] = useState('');
   const [streetName, setStreetName] = useState('');
   const [city, setCity] = useState('');
   const [state, setState] = useState('');
   const [zip, setZip] = useState('');
+
+  useEffect(() => {
+    const unsubscribe = Navigation.events().registerComponentListener(
+      {
+        componentDidAppear: async () => {
+          Utils._getUserData().then(user => {
+            setUser(user)
+            setStreet(user?.street)
+            setStreetName(user?.streetname)
+            setCity(user?.city)
+            setState(user?.state)
+            setZip(user?.zip?.toString())
+          })
+        }
+      },
+      props.componentId,
+    );
+    return () => unsubscribe.remove();
+  }, []);
 
   const isValidate = () => {
     if (Utils.isEmpty(street)) {
@@ -39,9 +61,27 @@ const EditAddress: React.FC<Props> = props => {
     }
   };
 
-  const onSubmit = () => {
+  const onSubmit = async (street: string, streetName: string, city: string, state: string, zip: string) => {
     if (isValidate()) {
-      Navigator.setPush(props.componentId, screenName.Verification);
+      const raw = JSON.stringify({
+        id: await Utils._getUserId(),
+        street: street,
+        streetName: streetName,
+        city: city,
+        state: state,
+        zip: zip,
+      });
+      const result: any = await ApiServices.post(ApiEndPoint.updateAddress, raw);
+      if (result.status) {
+        let userData: any = { ...user };
+        userData.street = result?.data?.street;
+        userData.streetname = result?.data?.streetname;
+        userData.city = result?.data?.city;
+        userData.state = result?.data?.state;
+        userData.zip = result?.data?.zip;
+        await Utils._setUserData(userData);
+        Navigator.setPop(props.componentId);
+      }
     }
   };
 
@@ -94,7 +134,7 @@ const EditAddress: React.FC<Props> = props => {
       <CustomButton
         title={'Submit'}
         marginTop={Utils.calculateHeight(60)}
-        onPress={() => onSubmit()}
+        onPress={() => onSubmit(street, streetName, city, state, zip)}
       />
     </MySafeArea>
   );

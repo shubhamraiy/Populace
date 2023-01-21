@@ -9,6 +9,7 @@ import MyTextInput from '@components/MyTextInput';
 import {Navigator} from '@Navigator';
 import {screenName} from '@screenName';
 import {ApiServices} from '../services/ApiServices';
+import { ApiEndPoint } from 'services/ApiEndPoint';
 
 export interface Props extends NavigationComponentProps {}
 const ChangePassword: React.FC<Props> = props => {
@@ -30,7 +31,7 @@ const ChangePassword: React.FC<Props> = props => {
         password: oldPassword,
         newPassword: password,
       });
-      const result: any = await ApiServices.post('changePassword', json);
+      const result: any = await ApiServices.post(ApiEndPoint.changePassword, json);
       if (result?.status) {
         Navigator.showAlert(result?.message, 'success');
         setTimeout(() => {

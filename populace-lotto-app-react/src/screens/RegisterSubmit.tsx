@@ -71,7 +71,6 @@ const RegisterSubmit: React.FC<Props> = props => {
         token: propsData?.token ?? undefined,
       });
 
-      // console.log('formData:', raw);
       const result: any = await ApiServices.post(ApiEndPoint.register, raw);
       if (result.status) {
         await Utils._setUserData(result?.data);

@@ -13,11 +13,13 @@ import {color, fontFamily, fontSize} from '@styles';
 import {ApiServices} from '../services/ApiServices';
 import {ApiEndPoint} from '../services/ApiEndPoint';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps {
+  propsData: any;
+}
 
 const TermsPrivacyTab: React.FC<Props> = props => {
   const [isSelected, setIsSelected] = useState(true);
-
+  const { propsData } = props;
   const [terms, setTerms] = useState<any>();
   const [privacy, setPrivacy] = useState<any>();
 
@@ -40,6 +42,7 @@ const TermsPrivacyTab: React.FC<Props> = props => {
   useEffect(() => {
     getPrivacyTerms();
     getPrivacyPolicy();
+    setIsSelected(propsData?.isTerms ?? true)
   }, []);
 
   return (

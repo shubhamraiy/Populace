@@ -18,14 +18,21 @@ registerScreens();
 
 export const Navigator = {
 
-  setSplash(screenName: any) {
+  setSplash(screen: any) {
     LogBox.ignoreAllLogs();
     LogBox.ignoreLogs(['flexWrap:']);
     LogBox.ignoreLogs(['VirtualizedLists should never be nested']);
     Navigation.events().registerAppLaunchedListener(async () => {
       this.setDefault();
-      this.setRoot(screenName);
+      this.setRoot(screen);
     });
+    Navigation.events().registerBottomTabSelectedListener(({ selectedTabIndex, unselectedTabIndex }) => {
+      Navigation.popToRoot(screenName.Subscription)
+      Navigation.popToRoot(screenName.HowItWork)
+      Navigation.popToRoot(screenName.Home)
+      Navigation.popToRoot(screenName.MyAccount)
+      Navigation.popToRoot(screenName.Profile)
+    })
   },
 
   // isSubscribe = () => {

@@ -8,17 +8,17 @@ import {
   View,
 } from 'react-native';
 import React from 'react';
-import {NavigationComponentProps} from 'react-native-navigation';
+import { NavigationComponentProps } from 'react-native-navigation';
 import MySafeArea from '@components/MySafeArea';
-import {color, fontFamily, fontSize} from '@styles';
-import {Utils} from '@Utils';
-import {screenName} from '@screenName';
-import {Navigator} from '@Navigator';
-import {MyAsyncStorage} from '@MyAsyncStorage';
-import {ApiServices} from '../services/ApiServices';
-import {ApiEndPoint} from '../services/ApiEndPoint';
+import { color, fontFamily, fontSize } from '@styles';
+import { Utils } from '@Utils';
+import { screenName } from '@screenName';
+import { Navigator } from '@Navigator';
+import { MyAsyncStorage } from '@MyAsyncStorage';
+import { ApiServices } from '../services/ApiServices';
+import { ApiEndPoint } from '../services/ApiEndPoint';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps { }
 
 const MyAccount: React.FC<Props> = props => {
   const _renderItems = (img: ImageSourcePropType, title: any, id?: number) => {
@@ -28,7 +28,7 @@ const MyAccount: React.FC<Props> = props => {
           if (id === 6) {
             const result: any = await ApiServices.post(
               ApiEndPoint.playerLogout,
-              JSON.stringify({email: await Utils.getEmail()}),
+              JSON.stringify({ email: await Utils.getEmail() }),
             );
             if (result?.status) {
               await MyAsyncStorage.logOut();
@@ -38,18 +38,18 @@ const MyAccount: React.FC<Props> = props => {
             id === 0
               ? screenName.AccountDetails
               : id === 1
-              ? screenName.RequestWithdraw
-              : id === 2
-              ? screenName.ModePickingNumber
-              : id === 3 || id === 4
-              ? screenName.TermsPrivacyTab
-              : screenName.ChangePassword;
-
-          Navigator.setPush(props.componentId, name);
+                ? screenName.RequestWithdraw
+                : id === 2
+                  ? screenName.ModePickingNumber
+                  : id === 3 || id === 4
+                    ? screenName.TermsPrivacyTab
+                    : screenName.ChangePassword;
+          const passProps = id === 3 ? { isTerms: true } : { isTerms: false }
+          Navigator.setPush(props.componentId, name, passProps);
         }}
         style={[
           styles.renderContainer,
-          {marginTop: id === 0 ? Utils.calculateHeight(22) : 0},
+          { marginTop: id === 0 ? Utils.calculateHeight(22) : 0 },
         ]}>
         <View style={styles.container}>
           <Image source={img} resizeMode={'contain'} style={styles.ivImage} />

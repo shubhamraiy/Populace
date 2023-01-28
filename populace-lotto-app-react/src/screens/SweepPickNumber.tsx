@@ -17,76 +17,166 @@ export interface Props extends NavigationComponentProps {
 
 const SweepPickNumber: React.FC<Props> = props => {
   const { propsData } = props;
+  const fromHome = props?.propsData?.fromHome ?? false;
   const [result, setResult] = useState<any>();
+  const [fromTable, setfromTable] = useState(false);
   const [numberOne, setNumberOne] = useState([]);
   const [numberTwo, setNumberTwo] = useState([]);
   const [numberThree, setNumberThree] = useState([]);
+  const [lnumberOne, setlNumberOne] = useState([]);
+  const [lnumberTwo, setlNumberTwo] = useState([]);
+  const [lnumberThree, setlNumberThree] = useState([]);
+  const [selectedData, setselectedData] = useState([]);
   const [currentUser, setCurrentUser] = useState<any>()
+  const [day, setDay] = useState<any>()
   const [hour, setHour] = useState<any>()
   const [minute, setMinute] = useState<any>()
   const [second, setSecond] = useState<any>()
+  const [day1, setDay1] = useState<any>()
+  const [hour1, setHour1] = useState<any>()
+  const [minute1, setMinute1] = useState<any>()
+  const [second1, setSecond1] = useState<any>()
+  const checkDate: any = new Date().getTime();
 
   useEffect(() => {
-    // const unsubscribe = Navigation.events().registerComponentListener(
-    //   {
-    //     componentDidAppear: () => {
-    // Utils._getUserData().then(user => {
-    //   setCurrentUser(user)
-    // })
-    // getDrawDetails();
-    //     }
-    //   },
-    //   props.componentId,
-    // );
-    // return () => unsubscribe.remove();
+    if (!fromTable) {
+      if (fromHome) {
+        getDrawDetailsfromHome();
+      } else {
+        const unsubscribe = Navigation.events().registerComponentListener(
+          {
+            componentDidAppear: () => {
+              Utils._getUserData().then(user => {
+                setCurrentUser(user)
+              })
+              getDrawDetails();
+            }
+          },
+          props.componentId,
+        );
+        return () => unsubscribe.remove();
+      }
+    }
+  }, []);
+
+
+
+  const getDrawDetailsfromHome = () => {
     setCurrentUser(propsData?.currentUser)
     setResult(propsData?.result);
     setNumberOne(propsData?.numberOne);
     setNumberTwo(propsData?.numberTwo);
     setNumberThree(propsData?.numberThree);
-  }, []);
+    setlNumberOne(propsData?.lnumberOne);
+    setlNumberTwo(propsData?.lnumberTwo);
+    setlNumberThree(propsData?.lnumberThree);
+    setselectedData(propsData?.selctednumber)
+  }
 
-  // const getDrawDetails = async () => {
-  //   const json = JSON.stringify({ id: await Utils._getUserId() });
-  //   const response: any = await ApiServices.post(ApiEndPoint.drawDetails, json);
+  const getDrawDetails = async () => {
+    const json = JSON.stringify({ id: await Utils._getUserId() });
+    const response: any = await ApiServices.post(ApiEndPoint.drawDetails, json);
+    var lotteryDate0 = new Date(response?.data?.lotteryDraw[0]?.timerDate).getTime()
+    var lotteryDate1 = new Date(response?.data?.lotteryDraw[1]?.timerDate).getTime()
 
-  //   if (response?.status) {
-  //     setResult(response?.data);
-  //     setNumberOne(response?.data?.numberSelectedByUser[0]?.numbers1);
-  //     setNumberTwo(response?.data?.numberSelectedByUser[1]?.numbers2);
-  //     setNumberThree(response?.data?.numberSelectedByUser[2]?.numbers3);
-  //   }
-  // };
-
-  console.log(propsData);
+    if (response?.status) {
+      if (checkDate < lotteryDate0) {
+        setResult(response?.data?.lotteryDraw[0]);
+      } else {
+        setResult(response?.data?.lotteryDraw[1]);
+      }
+      setNumberOne(response?.data?.numberSelectedByUser[0]?.numbers1);
+      setNumberTwo(response?.data?.numberSelectedByUser[1]?.numbers2);
+      setNumberThree(response?.data?.numberSelectedByUser[2]?.numbers3);
+      setlNumberOne(response?.data?.lastDrawnumberSelectedByUser[0]?.numbers1);
+      setlNumberTwo(response?.data?.lastDrawnumberSelectedByUser[1]?.numbers2);
+      setlNumberThree(response?.data?.lastDrawnumberSelectedByUser[2]?.numbers3);
+      setselectedData(response?.data?.lastDrawnumberSelectedByUser)
+    }
+  };
 
   useEffect(() => {
-    countDown();
-  }, [second]);
+    if (result) {
+      countDown(result?.timerDate);
+    }
+  }, [result, second]);
 
-  const countDown = () => {
-    var countDownDate = new Date(propsData?.result?.timerDate).getTime();
-    // var countDownDate = new Date("2023-01-21T15:30:00.000Z").getTime();
+  useEffect(() => {
+    if (selectedData.length > 0) {
+      if (result) {
+        countDown1(result?.timerDate);
+      }
+    }
+  }, [result, second1]);
+
+
+
+  // var get = Utils.getSeconds("2023-02-21T15:30:00.000Z");
+  // var getH = Utils.toHHMMSS(get);
+  // console.log("getH", getH);
+
+  const countDown = (timerDate: any) => {
+    var countDownDate = new Date(timerDate).getTime();
+    // var countDownDate = new Date("2023-02-21T15:30:00.000Z").getTime();
     var checknow = new Date().getTime();
     if (countDownDate > checknow) {
       var x = setInterval(function () {
         var now = new Date().getTime();
         var distance = countDownDate - now;
         var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        days = Utils.addZero(days);
+        setDay(days);
         var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-        setHour(hours)
+        hours = Utils.addZero(hours);
+        setHour(hours);
         var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-        setMinute(minutes)
+        minutes = Utils.addZero(minutes);
+        setMinute(minutes);
         var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-        setSecond(seconds)
+        seconds = Utils.addZero(seconds);
+        setSecond(seconds);
         if (distance < 0) {
           clearInterval(x);
         }
       }, 1000);
     } else {
+      setDay('00')
       setHour('00')
       setMinute('00')
       setSecond('00')
+    }
+  }
+
+  const countDown1 = (timerDate: any) => {
+    const newtimerDate = Utils.addHours(timerDate, 1);
+    // const newtimerDate = Utils.addHours("2023-02-21T15:30:00.000Z", 1);
+    var countDownDate = new Date(newtimerDate).getTime();
+    var checknow = new Date().getTime();
+    if (countDownDate > checknow) {
+      var x = setInterval(function () {
+        var now = new Date().getTime();
+        var distance = countDownDate - now;
+        var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+        days = Utils.addZero(days);
+        setDay1(days);
+        var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        hours = Utils.addZero(hours);
+        setHour1(hours);
+        var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        minutes = Utils.addZero(minutes);
+        setMinute1(minutes);
+        var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+        seconds = Utils.addZero(seconds);
+        setSecond1(seconds);
+        if (distance < 0) {
+          clearInterval(x);
+        }
+      }, 1000);
+    } else {
+      setDay1('00')
+      setHour1('00')
+      setMinute1('00')
+      setSecond1('00')
     }
   }
 
@@ -121,9 +211,23 @@ const SweepPickNumber: React.FC<Props> = props => {
                   setNumberThree(arr);
                 }
               },
+              fromscreen: (data: any) => { setfromTable(data) }
             })
           }
         />
+      </View>
+    );
+  };
+
+  const _renderNumbersLast = (list: any, type: number) => {
+    return (
+      <View style={styles.rowContainer}>
+        <CircleView marginStart={0} title={list?.length > 0 ? list[0] : ''} backgroundColor={color.royalBlue} />
+        <CircleView title={list?.length > 1 ? list[1] : ''} backgroundColor={color.royalBlue} />
+        <CircleView title={list?.length > 2 ? list[2] : ''} backgroundColor={color.royalBlue} />
+        <CircleView title={list?.length > 3 ? list[3] : ''} backgroundColor={color.royalBlue} />
+        <CircleView title={list?.length > 4 ? list[4] : ''} backgroundColor={color.royalBlue} />
+        <CircleView title={list?.length > 4 ? list[4] : ''} backgroundColor={color.ultramarineBlue} titleColor={color.black} borderWidth={0} />
       </View>
     );
   };
@@ -144,8 +248,7 @@ const SweepPickNumber: React.FC<Props> = props => {
           styles.tvDrewCut
         }>{`Draw cut -off time : ${result?.cutOffTime}`}</Text>
       <Text style={styles.tvRemaining}>Remaining Time</Text>
-      {/* <Text style={styles.tvTime}>30h : 20m : 22s</Text> */}
-      <Text style={styles.tvTime}>{hour}h : {minute}m : {second}s</Text>
+      <Text style={styles.tvTime}>{day > 0 ? day ?? '00' + "h : " : ""}{hour ?? '00'}h : {minute ?? '00'}m : {second ?? '00'}s</Text>
 
       {currentUser?.subscription?.tier >= 'tier1' && _renderNumbers(numberOne, 1)}
       {currentUser?.subscription?.tier >= 'tier2' && _renderNumbers(numberTwo, 2)}
@@ -174,39 +277,15 @@ const SweepPickNumber: React.FC<Props> = props => {
       />
 
       <Text style={styles.tvResult}>Results will be out in</Text>
-      <Text style={styles.tvTimeOut}>{result?.scheduledTime}</Text>
+      <Text style={styles.tvTimeOut}>{selectedData.length > 0 ? day1 > 0 ? day1 ?? "00" + ":" : "" + hour1 ?? "00" + ":" + minute1 ?? "00" + ":" + second : result?.scheduledTime}</Text>
       <Text style={styles.tvPickNumber}>Picked Numbers</Text>
-
-      {/*<View style={styles.rowContainerBottom}>*/}
-      {/*  <CircleView*/}
-      {/*    marginStart={0}*/}
-      {/*    title={2}*/}
-      {/*    backgroundColor={color.royalBlue}*/}
-      {/*  />*/}
-      {/*  <CircleView*/}
-      {/*    title={selectedData[0]?.title}*/}
-      {/*    backgroundColor={color.royalBlue}*/}
-      {/*  />*/}
-      {/*  <CircleView*/}
-      {/*    title={selectedData[0]?.title}*/}
-      {/*    backgroundColor={color.royalBlue}*/}
-      {/*  />*/}
-      {/*  <CircleView*/}
-      {/*    title={selectedData[0]?.title}*/}
-      {/*    backgroundColor={color.royalBlue}*/}
-      {/*  />*/}
-      {/*  <CircleView*/}
-      {/*    title={selectedData[0]?.title}*/}
-      {/*    backgroundColor={color.royalBlue}*/}
-      {/*  />*/}
-
-      {/*  <CircleView*/}
-      {/*    titleColor={color.black}*/}
-      {/*    borderWidth={0}*/}
-      {/*    title={24}*/}
-      {/*    backgroundColor={color.ultramarineBlue}*/}
-      {/*  />*/}
-      {/*</View>*/}
+      {selectedData.length > 0 &&
+        <>
+          {currentUser?.subscription?.tier >= 'tier1' && _renderNumbersLast(lnumberOne, 1)}
+          {currentUser?.subscription?.tier >= 'tier2' && _renderNumbersLast(lnumberTwo, 2)}
+          {currentUser?.subscription?.tier >= 'tier3' && _renderNumbersLast(lnumberThree, 3)}
+        </>
+      }
     </MySafeArea>
   );
 };

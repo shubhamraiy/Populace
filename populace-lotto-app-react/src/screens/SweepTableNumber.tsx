@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { NavigationComponentProps } from 'react-native-navigation';
 import MySafeArea from '@components/MySafeArea';
-import { FlatList, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Alert, FlatList, Platform, Pressable, StyleSheet, Text, View } from 'react-native';
 import { Utils } from '@Utils';
 import { color, fontFamily, fontSize } from '@styles';
 import CustomButton from '@components/CustomButton';
@@ -21,6 +21,8 @@ const SweepTableNumber: React.FC<Props> = props => {
   const [mNumber, setmNumber] = useState<any>(
     propsData?.list ? propsData?.list[propsData?.list?.length - 1] : '',
   );
+
+
 
   useEffect(() => {
     // console.log(propsData);
@@ -123,7 +125,11 @@ const SweepTableNumber: React.FC<Props> = props => {
               filterMain.length > 4 &&
               mainNumber[index]?.isSelected === false
             ) {
-              Navigator.showAlert('Maximum 5 number allow');
+              if (Platform.OS == 'android') {
+                Alert.alert('Maximum 5 number allow');
+              } else {
+                Navigator.showAlert('Maximum 5 number allow');
+              }
             } else {
               _selectedItems(type, item, index);
             }
@@ -144,7 +150,7 @@ const SweepTableNumber: React.FC<Props> = props => {
   const _renderList = (list: any, type: number) => {
     return (
       <FlatList
-        style={{ marginTop: Utils.calculateHeight(7) }}
+        style={{ marginTop: Utils.calculateHeight(7), alignSelf:'center'}}
         data={list}
         scrollEnabled={false}
         numColumns={7}
@@ -157,12 +163,14 @@ const SweepTableNumber: React.FC<Props> = props => {
     <MySafeArea
       componentId={props.componentId}
       isHideAppBar={true}
+      padding={0}
       isScroll={true}>
-      <Text style={styles.tvPickNumber}>Pick your numbers</Text>
+      <Text style={{...styles.tvPickNumber, marginTop:Utils.calculateWidth(30), marginLeft:Utils.calculateWidth(30)}}>Pick your numbers</Text>
 
       <CustomButton
         title={'+ Submit'}
         marginTop={Utils.calculateHeight(30)}
+        marginHorizontal={Utils.calculateWidth(30)}
         onPress={() => {
           const filterMain = mainNumber.filter((i: any) => i.isSelected);
           const filterMega = megaNumber.filter((i: any) => i.isSelected);
@@ -176,6 +184,7 @@ const SweepTableNumber: React.FC<Props> = props => {
               onSubmit([...filterMain, ...filterMega])
             } else {
               propsData?.callBack([...filterMain, ...filterMega]);
+              propsData?.fromscreen(true)
               Navigator.setPop(props.componentId);
             }
           }
@@ -200,20 +209,36 @@ const SweepTableNumber: React.FC<Props> = props => {
         />
       </View>
 
-      <View style={styles.viewDivider} />
+      <View style={{...styles.viewDivider, marginHorizontal:Utils.calculateWidth(30)}} />
       <Text
-        style={styles.tvClear}
+        style={{...styles.tvClear}}
         onPress={() => {
-          const filterData: any = mainNumber.map((i: any) => {
-            i.isSelected = false;
-            return i;
+          //To clear all data from array
+          // const filterData: any = mainNumber.map((i: any) => {
+          //   i.isSelected = false;
+          //   return i;
+          // });
+
+          //To clear data one by one
+          const Data: any = mainNumber.filter((i: any) => {
+            return i.isSelected == true;
           });
+          const index: any = mainNumber.findIndex((obj: any) => {
+            if (Data.length > 0) {
+              return obj.title === Data[Data.length - 1].title
+            }
+          })
+          let filterData = [...mainNumber]
+          if (index !== -1) {
+            filterData[index].isSelected = false;
+          }
+
           setMainNumber(filterData);
         }}>
         Clear
       </Text>
 
-      <Text style={styles.tvChoose}>Choose your main numbers</Text>
+      <Text style={{...styles.tvChoose, marginLeft:Utils.calculateWidth(30)}}>Choose your main numbers</Text>
 
       {_renderList(mainNumber, 1)}
       <View
@@ -221,13 +246,14 @@ const SweepTableNumber: React.FC<Props> = props => {
           flexDirection: 'row',
           justifyContent: 'space-between',
           marginTop: Utils.calculateHeight(22),
-          // marginBottom:Utils.calculateHeight(7)
+          // marginBottom:Utils.calculateHeight(7),
+          marginHorizontal:Utils.calculateWidth(30)
         }}>
         <Text style={[styles.tvChoose, { marginTop: 0 }]}>
           Choose your mega numbers
         </Text>
         <Text
-          style={[styles.tvChoose, { marginTop: 0, marginEnd: 10 }]}
+          style={[styles.tvChoose, { marginTop: 0}]}
           onPress={() => {
             const filterData: any = megaNumber.map((i: any) => {
               i.isSelected = false;
@@ -240,6 +266,7 @@ const SweepTableNumber: React.FC<Props> = props => {
         </Text>
       </View>
       {_renderList(megaNumber, 2)}
+      <View style={{height:20}} />
     </MySafeArea>
   );
 };
@@ -289,7 +316,7 @@ const styles = StyleSheet.create({
     fontFamily: fontFamily.Medium,
     color: color.sapphireBlue,
     alignSelf: 'flex-end',
-    marginEnd: 5,
+    marginEnd: 30,
     marginTop: Utils.calculateHeight(5),
   },
 });

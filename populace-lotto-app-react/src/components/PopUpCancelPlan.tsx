@@ -25,6 +25,11 @@ const PopUpCancelPlan: React.FC<Props> = props => {
       await Utils._setUserData(response?.data);
       if (propsData?.isShow) {
         Navigator.setHome()
+        Navigation.popToRoot(screenName.Subscription)
+        Navigation.popToRoot(screenName.HowItWork)
+        Navigation.popToRoot(screenName.Home)
+        Navigation.popToRoot(screenName.MyAccount)
+        Navigation.popToRoot(screenName.Profile)
       }
       Navigator.dismissOverlay()
       Navigator.setMergeOption(props.componentId, 2);

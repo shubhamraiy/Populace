@@ -17,7 +17,12 @@ const Home: React.FC<Props> = props => {
   const [numberOne, setNumberOne] = useState([]);
   const [numberTwo, setNumberTwo] = useState([]);
   const [numberThree, setNumberThree] = useState([]);
+  const [lnumberOne, setlNumberOne] = useState([]);
+  const [lnumberTwo, setlNumberTwo] = useState([]);
+  const [lnumberThree, setlNumberThree] = useState([]);
+  const [selctednumber, setselctednumber] = useState([]);
   const [currentUser, setCurrentUser] = useState<any>()
+  const checkDate: any = new Date().getTime();
 
   useEffect(() => {
     const unsubscribe = Navigation.events().registerComponentListener(
@@ -38,12 +43,24 @@ const Home: React.FC<Props> = props => {
   const getDrawDetails = async () => {
     const json = JSON.stringify({ id: await Utils._getUserId() });
     const response: any = await ApiServices.post(ApiEndPoint.drawDetails, json);
+    // console.log("Draw Details...", JSON.stringify(response));
     setStatus(response?.status)
+    var lotteryDate0 = new Date(response?.data?.lotteryDraw[0]?.timerDate).getTime()
+    var lotteryDate1 = new Date(response?.data?.lotteryDraw[1]?.timerDate).getTime()
+
     if (response?.status) {
-      setResult(response?.data);
+      if (checkDate < lotteryDate0) {
+        setResult(response?.data?.lotteryDraw[0]);
+      } else {
+        setResult(response?.data?.lotteryDraw[1]);
+      }
       setNumberOne(response?.data?.numberSelectedByUser[0]?.numbers1);
       setNumberTwo(response?.data?.numberSelectedByUser[1]?.numbers2);
       setNumberThree(response?.data?.numberSelectedByUser[2]?.numbers3);
+      setlNumberOne(response?.data?.lastDrawnumberSelectedByUser[0]?.numbers1);
+      setlNumberTwo(response?.data?.lastDrawnumberSelectedByUser[1]?.numbers2);
+      setlNumberThree(response?.data?.lastDrawnumberSelectedByUser[2]?.numbers3);
+      setselctednumber(response?.data?.lastDrawnumberSelectedByUser)
     }
   };
 
@@ -71,7 +88,12 @@ const Home: React.FC<Props> = props => {
               currentUser: currentUser,
               numberOne: numberOne,
               numberTwo: numberTwo,
-              numberThree: numberThree
+              numberThree: numberThree,
+              lnumberOne: lnumberOne,
+              lnumberTwo: lnumberTwo,
+              lnumberThree: lnumberThree,
+              selctednumber: selctednumber,
+              fromHome: true,
             });
           } else if (type === 3 || type === 4) {
             Navigator.setPush(props.componentId, name)

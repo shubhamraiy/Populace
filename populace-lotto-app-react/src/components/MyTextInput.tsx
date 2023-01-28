@@ -6,10 +6,11 @@ import {
   Text,
   TextInput,
   View,
+  Platform
 } from 'react-native';
 import React from 'react';
-import {color, fontFamily, fontSize} from '@styles';
-import {Utils} from '@Utils';
+import { color, fontFamily, fontSize } from '@styles';
+import { Utils } from '@Utils';
 
 export interface Props {
   placeholder?: any;
@@ -114,7 +115,7 @@ export default MyTextInput;
 const styles = StyleSheet.create({
   inputContainer: {
     backgroundColor: '#0C2271',
-    height: Utils.calculateHeight(52),
+    height: Platform.OS == 'ios' ? Utils.calculateHeight(52) : undefined,
     marginTop: Utils.calculateHeight(5),
     borderRadius: Utils.calculateHeight(5),
     color: color.white,

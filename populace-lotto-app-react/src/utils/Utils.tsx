@@ -3,9 +3,9 @@ import {
   responsiveWidth,
 } from 'react-native-responsive-dimensions';
 import NetInfo from '@react-native-community/netinfo';
-import {keyName, MyAsyncStorage} from '@MyAsyncStorage';
+import { keyName, MyAsyncStorage } from '@MyAsyncStorage';
 import React from 'react';
-import {Alert, Dimensions, Share} from 'react-native';
+import { Alert, Dimensions, Share } from 'react-native';
 
 export const Utils = {
   exp_pattern_mobile: /^[0-9]{6,14}$/,
@@ -17,7 +17,6 @@ export const Utils = {
   isUrlValid(url: any) {
     let reg = Utils.exp_pattern_url;
     // console.log('Url validation', reg.test(url));
-
     return reg.test(url);
   },
 
@@ -28,9 +27,7 @@ export const Utils = {
 
   calculateHeight(componentHeight: number) {
     //812 is the screen height which we used to create design of the app
-    return responsiveHeight(
-      (100 / Dimensions.get('screen').height) * componentHeight,
-    );
+    return responsiveHeight((100 / Dimensions.get('screen').height) * componentHeight);
   },
 
   calculateWidth(componentWidth: number) {
@@ -146,4 +143,27 @@ export const Utils = {
   isEmpty(value: any) {
     return value.trim().length === 0;
   },
+
+  addHours(date: any, hours: any) {
+    const dateAdded = new Date(date);
+    dateAdded.setHours(dateAdded.getHours() + hours);
+    return dateAdded;
+  },
+
+  subtHours(date: any, hours: any) {
+    const dateSubtracted = new Date(date);
+    dateSubtracted.setHours(dateSubtracted.getHours() - hours);
+    return dateSubtracted;
+  },
+
+  getSeconds(date: any){
+    const seconds = new Date(date);
+    seconds.getSeconds();
+    return seconds
+  },
+
+  addZero(i: any) {
+    if (i < 10) { i = "0" + i }
+    return i;
+  }
 };

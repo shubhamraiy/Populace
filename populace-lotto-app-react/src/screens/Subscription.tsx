@@ -1,4 +1,5 @@
 import {
+  Alert,
   FlatList,
   Pressable,
   SectionList,
@@ -103,30 +104,42 @@ const Subscription: React.FC<Props> = props => {
   const [data, setData] = useState(DATA);
   const [saveItems, setSaveItems] = useState<any>();
   const [selectedTier, setSelectedTier] = useState('');
+  const [isGrade, setIsGrade] = useState(false);
   const [currentPlan, setCurrentPlan] = useState<any>();
 
   useEffect(() => {
-    Utils._getUserData().then(user => {
-      // console.log("UserData:", user);
-      // console.log(Object.keys(user.subscription).length);
-
-      setCurrentPlan(user);
-      setSelectedTier(user.subscription.tier);
-      const filterData: any = [];
-      data.map((item: any) => {
-        item?.data?.map((i: any) => {
-          if (item?.tier === user?.subscription?.tier) {
-            if (i.plan === user?.subscription?.plan) {
-              setSaveItems(i);
-              i.isSelected = true;
-            }
-            return i;
-          }
-        });
-        filterData.push(item);
-      });
-      setData(filterData);
-    });
+    const unsubscribe = Navigation.events().registerComponentListener(
+      {
+        componentDidAppear: () => {
+          Utils._getUserData().then(user => {
+            // console.log("UserData:", user);
+            // console.log(Object.keys(user.subscription).length);
+            setSaveItems({
+              plan: user?.subscription?.plan,
+              amountInr: user?.subscription?.amount,
+            })
+            setCurrentPlan(user);
+            setSelectedTier(user.subscription.tier);
+            const filterData: any = [];
+            data.map((item: any) => {
+              item?.data?.map((i: any) => {
+                if (item?.tier === user?.subscription?.tier) {
+                  if (i.plan === user?.subscription?.plan) {
+                    setSaveItems(i);
+                    i.isSelected = true;
+                  }
+                  return i;
+                }
+              });
+              filterData.push(item);
+            });
+            setData(filterData);
+          });
+        }
+      },
+      props.componentId,
+    );
+    return () => unsubscribe.remove();
   }, []);
 
 
@@ -140,7 +153,6 @@ const Subscription: React.FC<Props> = props => {
         plan: saveItems.plan,
         amount: saveItems.amountInr,
       });
-      console.log(json);
 
       const response: any = await ApiServices.post(
         type === 0 ? ApiEndPoint.subscriptionPost : type === 1 ? ApiEndPoint.downgradeSubscription : ApiEndPoint.upgradeSubscription, json,);
@@ -152,6 +164,11 @@ const Subscription: React.FC<Props> = props => {
         Navigator.showAlert(response?.message, 'success');
         if (propsData?.isShow) {
           Navigator.setHome()
+          Navigation.popToRoot(screenName.Subscription)
+          Navigation.popToRoot(screenName.HowItWork)
+          Navigation.popToRoot(screenName.Home)
+          Navigation.popToRoot(screenName.MyAccount)
+          Navigation.popToRoot(screenName.Profile)
         }
         Navigator.setMergeOption(props.componentId, 2);
       }
@@ -159,10 +176,6 @@ const Subscription: React.FC<Props> = props => {
       Navigator.showAlert('Please select plan');
     }
   };
-
-
-
-
 
   const _renderItems = (item: any, index: any) => {
     return (
@@ -184,8 +197,29 @@ const Subscription: React.FC<Props> = props => {
             height={Utils.calculateHeight(39)}
             width={'45%'}
             onPress={() => {
-              setSelectedTier(item.tier);
-              setSaveItems(item.data[0]);
+              if (currentPlan?.isSubscribe) {
+                if (item.data[0]?.amountInr !== currentPlan?.subscription?.amount) {
+                  Alert.alert('Plan Change', 'Do you want to change your plan?', [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'Yes', onPress: () => {
+                        setSelectedTier(item.tier);
+                        setSaveItems(item.data[0]);
+                      }
+                    },
+                  ]);
+                } else {
+                  setSelectedTier(item.tier);
+                  setSaveItems(item.data[0]);
+                }
+              } else {
+                setSelectedTier(item.tier);
+                setSaveItems(item.data[0]);
+              }
+
             }}
           />
           <CustomButton
@@ -203,11 +237,35 @@ const Subscription: React.FC<Props> = props => {
             height={Utils.calculateHeight(39)}
             width={'45%'}
             onPress={() => {
-              setSelectedTier(item.tier);
-              setSaveItems(item.data[1]);
+              if (currentPlan?.isSubscribe) {
+                if (item.data[1].amountInr !== currentPlan?.subscription?.amount) {
+                  Alert.alert('Plan Change', 'Do you want to change your plan?', [
+                    {
+                      text: 'Cancel',
+                      style: 'cancel',
+                    },
+                    {
+                      text: 'Yes', onPress: () => {
+                        setSelectedTier(item.tier);
+                        setSaveItems(item.data[1]);
+                      }
+                    },
+                  ]);
+                } else {
+                  setSelectedTier(item.tier);
+                  setSaveItems(item.data[1]);
+                }
+              } else {
+                setSelectedTier(item.tier);
+                setSaveItems(item.data[1]);
+              }
             }}
           />
         </View>
+        {(item.data[0].amountInr == currentPlan?.subscription?.amount) &&
+          <Text style={{ ...styles.tvItemTitle, marginTop: 0 }}>
+            Expiry date: {currentPlan?.subscription?.expireDate + " ($" + currentPlan?.subscription?.amount + ")"}</Text>
+        }
       </View>
     );
   };
@@ -220,12 +278,10 @@ const Subscription: React.FC<Props> = props => {
             title={'Upgrade'}
             width={'47%'}
             onPress={() => {
-              // console.log('Upgrade', currentPlan?.subscription?.tier > selectedTier);
-
               if (currentPlan?.subscription?.tier > selectedTier) {
                 Navigator.showAlert('Selected plan downgraded');
-              } else if (currentPlan?.subscription?.tier > selectedTier) {
-
+              } else if (currentPlan?.subscription?.amount === saveItems?.amountInr) {
+                Alert.alert("Current plan selected")
               } else {
                 // Navigator.showAlert('Success', 'success');
                 subscriptionPost(2)
@@ -242,22 +298,20 @@ const Subscription: React.FC<Props> = props => {
               // console.log('Downgrade', selectedTier);
               if (currentPlan?.subscription?.tier < selectedTier) {
                 Navigator.showAlert('Selected plan upgradeable');
-              } else if (currentPlan?.subscription?.tier < selectedTier) {
-
+              } else if (currentPlan?.subscription?.amount == saveItems?.amountInr) {
+                Alert.alert("Current plan selected")
               } else {
                 // Navigator.showAlert('Success', 'success');
                 subscriptionPost(1)
-
               }
-
             }}
           />
         </View>
-        <Text
+        {currentPlan?.isSubscribe && <Text
           onPress={() => Navigator.showOverlay(screenName.PopUpCancelPlan)}
           style={styles.tvCancel}>
           Cancel
-        </Text>
+        </Text>}
       </View>
     );
   };
@@ -273,27 +327,31 @@ const Subscription: React.FC<Props> = props => {
         renderItem={({ item, index }) => _renderItems(item, index)}
       />
 
-      <Pressable
-        style={styles.btnAndroidIosPay}
-        onPress={() => subscriptionPost(0)}>
-        <TextWithIcon
-          title={'Android Pay'}
-          icon={require('@images/ic_android.png')}
-        />
-        <Text> / </Text>
-        <TextWithIcon
-          title={'Apple Pay'}
-          icon={require('@images/ic_apple.png')}
-        />
-      </Pressable>
 
-      <CustomButton
-        title={'Credit/Debit card'}
-        marginTop={Utils.calculateHeight(30)}
-        onPress={() => subscriptionPost(0)}
-      />
-
-      {_btnDownUpGrade()}
+      {currentPlan?.isSubscribe ?
+        _btnDownUpGrade() :
+        (<>
+          <Pressable
+            style={styles.btnAndroidIosPay}
+            onPress={() => subscriptionPost(0)}>
+            <TextWithIcon
+              title={'Android Pay'}
+              icon={require('@images/ic_android.png')}
+            />
+            <Text> / </Text>
+            <TextWithIcon
+              title={'Apple Pay'}
+              icon={require('@images/ic_apple.png')}
+            />
+          </Pressable>
+          <CustomButton
+            title={'Credit/Debit card'}
+            marginTop={Utils.calculateHeight(30)}
+            onPress={() => subscriptionPost(0)}
+          />
+        </>
+        )
+      }
     </MySafeArea>
   );
 };

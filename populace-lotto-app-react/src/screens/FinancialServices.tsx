@@ -1,14 +1,16 @@
 import React from 'react';
 import MySafeArea from '@components/MySafeArea';
-import {StyleSheet, Text} from 'react-native';
-import {NavigationComponentProps} from 'react-native-navigation';
-import {color, fontFamily, fontSize} from '@styles';
+import { StyleSheet, Text, View } from 'react-native';
+import { NavigationComponentProps } from 'react-native-navigation';
+import { color, fontFamily, fontSize } from '@styles';
 
-export interface Props extends NavigationComponentProps {}
+export interface Props extends NavigationComponentProps { }
 const FinancialServices: React.FC<Props> = props => {
   return (
     <MySafeArea componentId={props.componentId} padding={0}>
-      <Text style={styles.tvComingSoon}>{'Services\nComing Soon'}</Text>
+      <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center' }}>
+        <Text style={styles.tvComingSoon}>{'Services\nComing Soon'}</Text>
+      </View>
     </MySafeArea>
   );
 };
@@ -21,7 +23,6 @@ const styles = StyleSheet.create({
     color: color.white,
     fontFamily: fontFamily.SemiBold,
     opacity: 0.5,
-    flex: 1,
     textAlign: 'center',
     textAlignVertical: 'center',
   },

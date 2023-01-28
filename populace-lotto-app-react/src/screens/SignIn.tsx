@@ -1,4 +1,4 @@
-import { Platform, StyleSheet, Text, View } from 'react-native';
+import { Platform, StyleSheet, Text, View, } from 'react-native';
 import CheckBox from '@react-native-community/checkbox';
 import React, { useEffect, useState } from 'react';
 import MySafeArea from '@components/MySafeArea';
@@ -14,7 +14,6 @@ import { ApiServices } from '../services/ApiServices';
 import { ApiEndPoint } from '../services/ApiEndPoint';
 import { GoogleSignin } from '@react-native-google-signin/google-signin';
 import appleAuth from '@invertase/react-native-apple-authentication';
-
 export interface Props extends NavigationComponentProps { }
 
 const SignIn: React.FC<Props> = props => {
@@ -65,6 +64,7 @@ const SignIn: React.FC<Props> = props => {
       await Utils._setUserData(result?.data);
       if (result?.data?.isSubscribe) {
         Navigator.setHome();
+        Navigator.setMergeOption(screenName.Home, 2)
       } else {
         Navigator.setRoot(screenName.Subscription, { isShow: true });
       }
@@ -137,6 +137,7 @@ const SignIn: React.FC<Props> = props => {
         await Utils._setUserData(result?.data);
         if (result?.data?.isSubscribe) {
           Navigator.setHome();
+          Navigator.setMergeOption(screenName.Home, 2)
         } else {
           Navigator.setRoot(screenName.Subscription, { isShow: true });
         }
@@ -182,7 +183,7 @@ const SignIn: React.FC<Props> = props => {
         </View>
       </View>
       <CustomButton
-        title={'Submit'}
+        title={'Sign In'}
         marginTop={Utils.calculateHeight(39)}
         onPress={() => _onSubmit()}
       />
@@ -239,10 +240,12 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginTop: Utils.calculateHeight(6),
+    marginTop: Platform.OS == 'ios' ? Utils.calculateWidth(8) : Utils.calculateHeight(6),
+    marginLeft: Platform.OS == 'ios' ? Utils.calculateWidth(4) : undefined,
   },
   checkbox: {
     alignSelf: 'center',
+    marginRight: Platform.OS == 'ios' ? Utils.calculateWidth(10) : undefined,
   },
   tvLabel: {
     color: color.white,

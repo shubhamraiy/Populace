@@ -26,7 +26,7 @@ const Verification: React.FC<Props> = props => {
           resizeMode="stretch"
           source={require('@images/register_bg_popup.png')}>
           <Text style={styles.tvRegister}>
-            {propsData?.isEmailChanged ? "Email Verification" : "Register"}
+            {propsData?.isEmailChanged ? "Email Verification" : "Registration"}
           </Text>
           <Text style={styles.tvTitle}>
             {propsData?.isEmailChanged ?

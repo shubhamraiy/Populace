@@ -1,0 +1,51 @@
+// prettier-ignore
+{
+  "extends": "@tsconfig/react-native/tsconfig.json",     /* Recommended React Native TSConfig base */
+  "compilerOptions": {
+    /* Visit https://aka.ms/tsconfig.json to read more about this file */
+
+    /* Completeness */
+    "skipLibCheck": true,                                 /* Skip type checking all .d.ts files. */
+    "baseUrl": "./src",
+    "paths": {
+      "@components/*": [
+        "./components/*"
+      ],
+      "@screens/*": [
+        "./screens/"
+      ],
+      "@screenName": [
+        "./routers/registerScreens"
+      ],
+      "@services": [
+        "./services/"
+      ],
+      "@Utils": [
+        "./utils/Utils.tsx"
+      ],
+      "@images": [
+        "./assets/images/"
+      ],
+      "@Navigator": [
+        "./routers/Navigator"
+      ],
+      "@MyAsyncStorage": [
+        "./storage/MyAsyncStorage"
+      ],
+      "@keyName": [
+        "./storage/keyName"
+      ],
+      "@styles": [
+        "./styles/styles"
+      ],
+      "@strings": [
+        "./styles/strings"
+      ],
+      "@ApiClient": [
+        "./services/ApiClient"
+      ]
+    }
+  }
+
+}
+
